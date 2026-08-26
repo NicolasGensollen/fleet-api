@@ -1,0 +1,25 @@
+# ============================================================================
+# TD 1, étape 4 — workflow de référence
+#
+# À placer dans .github/workflows/ci.yml
+#
+# ============================================================================
+
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v10.0.1
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Lancer les tests
+        run: uv run pytest -v
