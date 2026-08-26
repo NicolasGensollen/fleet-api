@@ -124,7 +124,7 @@ def path_length_m(positions: list[Position]) -> float:
     """
     # TODO: à tester
     total = 0.0
-    for i in range(len(positions) - 2):
+    for i in range(len(positions) - 1):
         total += distance_m(positions[i], positions[i + 1])
     return total
 
