@@ -15,7 +15,7 @@ batterie, position, état de charge. `fleet-api` la reçoit et en calcule des
 indicateurs — niveau de charge, autonomie restante, distance parcourue, alertes
 batterie, agrégats de flotte.
 
-Le cœur métier vit dans `src/fleet_api/telemetry.py` : une dizaine de
+Le coeur métier vit dans `src/fleet_api/telemetry.py` : une dizaine de
 **fonctions pures**, sans état ni entrée-sortie, donc directement testables.
 
 ## Démarrage
