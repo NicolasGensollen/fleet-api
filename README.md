@@ -10,13 +10,9 @@ d'intégration et de déploiement complète.
 
 ## Ce que fait le service
 
-Les robots d'un entrepôt émettent régulièrement leur télémétrie : tension
-batterie, position, état de charge. `fleet-api` la reçoit et en calcule des
-indicateurs — niveau de charge, autonomie restante, distance parcourue, alertes
-batterie, agrégats de flotte.
+Les robots d'un entrepôt émettent régulièrement leur télémétrie : tension batterie, position, état de charge. `fleet-api` la reçoit et en calcule des indicateurs — niveau de charge, autonomie restante, distance parcourue, alertes batterie, agrégats de flotte.
 
-Le coeur métier vit dans `src/fleet_api/telemetry.py` : une dizaine de
-**fonctions pures**, sans état ni entrée-sortie, donc directement testables.
+Le coeur métier vit dans `src/fleet_api/telemetry.py` : une dizaine de **fonctions pures**, sans état ni entrée-sortie, donc directement testables.
 
 ## Démarrage
 
@@ -48,8 +44,7 @@ tests/
 ## Backlog
 
 Évolutions possibles pour le rendu final, par ordre de difficulté croissante.
-Vous n'avez pas à toutes les traiter : mieux vaut deux fonctionnalités bien
-testées et bien intégrées que six bâclées.
+Vous n'avez pas à toutes les traiter : mieux vaut deux fonctionnalités bien testées et bien intégrées que six bâclées.
 
 - [ ] `GET /robots/{id}/history` — historique de télémétrie d'un robot
 - [ ] Alerte sur immobilité prolongée (aucun déplacement depuis N minutes)
