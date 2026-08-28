@@ -2,9 +2,7 @@
 
 Mini-service de supervision d'une flotte de robots d'entrepôt.
 
-Ce dépôt est le **fil rouge** du module *Usine Logicielle et CI/CD* (CLIC A3). Vous
-allez le faire grossir séance après séance jusqu'à disposer d'une chaîne
-d'intégration et de déploiement complète.
+Ce dépôt est le **fil rouge** du module *Usine Logicielle et CI/CD* (CLIC A3). Vous allez le faire grossir séance après séance jusqu'à disposer d'une chaîne d'intégration et de déploiement complète.
 
 ---
 
