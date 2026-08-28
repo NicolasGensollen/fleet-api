@@ -1,5 +1,5 @@
 # ============================================================================
-# TD 1, étape 4 — workflow de référence
+# TD 2, étape 1 — workflow de référence
 #
 # À placer dans .github/workflows/ci.yml
 #
@@ -7,19 +7,39 @@
 
 name: CI
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.0.1
+      - run: uv sync
+      - name : Vérifier les règles de style
+        run: uv run ruff check .
+      - name: Vérifier le formatage
+        run: uv run ruff format --check .
+    
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
       - name: Installer uv
         uses: astral-sh/setup-uv@v10.0.1
-
       - name: Installer les dépendances
         run: uv sync
-
       - name: Lancer les tests
         run: uv run pytest -v
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.0.1
+      - run: uv sync
+      - run: uv build
