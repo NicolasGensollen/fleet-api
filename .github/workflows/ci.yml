@@ -1,5 +1,5 @@
 # ============================================================================
-# TD 2, étape 2 — workflow de référence
+# TD 2, étape 3 — workflow de référence
 #
 # À placer dans .github/workflows/ci.yml
 #
@@ -41,8 +41,13 @@ jobs:
           enable-cache: true
       - name: Installer les dépendances
         run: uv sync --python ${{ matrix.python-version }}
-      - name: Lancer les tests
-        run: uv run pytest -v
+      - name: Tests et Couverture
+        run: uv run pytest -v --cov=fleet_api --cov-report=html --cov-report=term
+      - uses: actions/upload-artifact@v7
+        with:
+          name: couverture-py${{ matrix.python-version }}
+          path: htmlcov/
+          retention-days: 7
 
   build:
     runs-on: ubuntu-latest
