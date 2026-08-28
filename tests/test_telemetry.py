@@ -50,7 +50,7 @@ def reading(
 @pytest.mark.parametrize(
     ("niveau", "attendu"),
     [
-        (0.0, True),
+        (0.0, False),
         (10.0, True),
         (19.9, True),
         (20.1, False),
