@@ -4,8 +4,7 @@ Toutes les fonctions de ce module sont *pures* : elles ne lisent ni n'écrivent
 aucun état global, ne font pas d'entrée-sortie, et retournent toujours le même
 résultat pour les mêmes arguments. C'est ce qui les rend faciles à tester.
 
-⚠️  Ce module est le support du TD 1. La spécification de chaque fonction est
-    dans sa docstring : c'est **elle** qui fait foi, pas le code.
+La spécification de chaque fonction est dans sa docstring : c'est **elle** qui fait foi, pas le code.
 """
 
 from __future__ import annotations
