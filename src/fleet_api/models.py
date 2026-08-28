@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class RobotState(str, Enum):
+class RobotState(StrEnum):
     """État opérationnel d'un robot, du plus au moins critique."""
 
     OFFLINE = "offline"

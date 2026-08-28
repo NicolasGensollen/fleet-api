@@ -278,5 +278,7 @@ def fleet_summary(
     return {
         "robot_count": len(readings),
         "average_battery_pct": round(sum(levels) / len(levels), 1) if levels else 0,
-        "low_battery_count": sum(1 for lvl in levels if is_low_battery(lvl, threshold_pct)),
+        "low_battery_count": sum(
+            1 for lvl in levels if is_low_battery(lvl, threshold_pct)
+        ),
     }

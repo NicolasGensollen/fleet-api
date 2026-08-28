@@ -49,7 +49,14 @@ def reading(
 
 @pytest.mark.parametrize(
     ("niveau", "attendu"),
-    [(0.0, True), (10.0, True), (19.9, True), (20.1, False), (50.0, False), (100.0, False)],
+    [
+        (0.0, True),
+        (10.0, True),
+        (19.9, True),
+        (20.1, False),
+        (50.0, False),
+        (100.0, False),
+    ],
 )
 def test_is_low_battery_de_part_et_dautre_du_seuil(niveau, attendu):
     assert is_low_battery(niveau) is attendu
@@ -161,16 +168,25 @@ def test_median_voltage_mv_nombre_pair():
 
 
 def test_robot_state_operationnel():
-    assert robot_state(reading(voltage_mv=12_600, timestamp_s=1_000), now_s=1_010) is RobotState.OPERATIONAL
+    assert (
+        robot_state(reading(voltage_mv=12_600, timestamp_s=1_000), now_s=1_010)
+        is RobotState.OPERATIONAL
+    )
 
 
 def test_robot_state_batterie_basse():
     # 10 700 mV -> environ 9,5 %
-    assert robot_state(reading(voltage_mv=10_700, timestamp_s=1_000), now_s=1_010) is RobotState.LOW_BATTERY
+    assert (
+        robot_state(reading(voltage_mv=10_700, timestamp_s=1_000), now_s=1_010)
+        is RobotState.LOW_BATTERY
+    )
 
 
 def test_robot_state_en_charge():
-    assert robot_state(reading(timestamp_s=1_000, is_charging=True), now_s=1_010) is RobotState.CHARGING
+    assert (
+        robot_state(reading(timestamp_s=1_000, is_charging=True), now_s=1_010)
+        is RobotState.CHARGING
+    )
 
 
 def test_robot_state_hors_ligne():
@@ -195,7 +211,9 @@ def test_robot_state_en_charge_prime_sur_batterie_basse():
 
 def test_robot_state_juste_au_delai_de_grace():
     """La spec dit « plus de grace_s » : exactement grace_s n'est pas hors ligne."""
-    assert robot_state(reading(timestamp_s=1_000), now_s=1_120) is not RobotState.OFFLINE
+    assert (
+        robot_state(reading(timestamp_s=1_000), now_s=1_120) is not RobotState.OFFLINE
+    )
 
 
 # --------------------------------------------------------------------------
