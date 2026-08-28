@@ -1,5 +1,5 @@
 # ============================================================================
-# TD 2, étape 1 — workflow de référence
+# TD 2, étape 2 — workflow de référence
 #
 # À placer dans .github/workflows/ci.yml
 #
@@ -29,6 +29,10 @@ jobs:
     
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v7
       - name: Installer uv
@@ -36,7 +40,7 @@ jobs:
         with:
           enable-cache: true
       - name: Installer les dépendances
-        run: uv sync
+        run: uv sync --python ${{ matrix.python-version }}
       - name: Lancer les tests
         run: uv run pytest -v
 
