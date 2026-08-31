@@ -36,10 +36,19 @@ jobs:
           echo "Contenu de dist/ :"
           ls -la dist/
 
+      - uses: actions/upload-artifact@v7
+        with:
+          name: distribution
+          path: dist/
+
   verifier:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: distribution
+          path: dist/
       - name: Vérifier que la distribution existe
         run: |
           ls -la dist/
