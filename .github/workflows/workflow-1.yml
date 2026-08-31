@@ -1,0 +1,40 @@
+# ============================================================================
+# PANNE 1
+#
+# Symptôme rapporté par l'équipe :
+#
+#   « J'ai ouvert une pull request qui modifie des tests. La PR est bloquée :
+#     GitHub affiche "Expected — Waiting for status to be reported" sur le
+#     check `tests`, et ça ne bouge pas. L'onglet Actions ne montre aucun run
+#     pour ma PR. Pourtant le workflow marchait la semaine dernière quand j'ai
+#     modifié du code applicatif. »
+#
+# Contexte : la branche par défaut du dépôt est `main`.
+#            Le check `tests` est déclaré comme statut requis dans les règles
+#            de protection de branche.
+#
+# Votre mission : faire en sorte que le pipeline s'exécute sur toutes les pull
+# requests, sans supprimer la protection de branche.
+# ============================================================================
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v10.0.1
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Lancer les tests
+        run: uv run pytest -v
