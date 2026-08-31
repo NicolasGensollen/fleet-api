@@ -1,0 +1,17 @@
+name: 'Préparer l''environnement'
+description: 'Installe uv, active le cache et synchronise les dépendances'
+
+inputs:
+  python-version:
+    description: 'Version de Python'
+    required: false
+    default: '3.14'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: astral-sh/setup-uv@v10.0.1
+      with:
+        enable-cache: true
+    - shell: bash
+      run: uv sync --python ${{ inputs.python-version }}

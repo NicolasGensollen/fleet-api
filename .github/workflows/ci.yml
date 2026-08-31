@@ -18,10 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.0.1
-        with:
-          enable-cache: true
-      - run: uv sync
+      - uses: ./.github/actions/setup
       - name : Vérifier les règles de style
         run: uv run ruff check .
       - name: Vérifier le formatage
@@ -35,12 +32,9 @@ jobs:
         python-version: ['3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v7
-      - name: Installer uv
-        uses: astral-sh/setup-uv@v10.0.1
+      - uses: ./.github/actions/setup
         with:
-          enable-cache: true
-      - name: Installer les dépendances
-        run: uv sync --python ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
       - name: Tests et Couverture
         run: uv run pytest -v --cov=fleet_api --cov-report=html --cov-report=term
       - uses: actions/upload-artifact@v7
@@ -53,8 +47,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.0.1
-        with:
-          enable-cache: true
-      - run: uv sync
+      - uses: ./.github/actions/setup
       - run: uv build
