@@ -17,3 +17,39 @@
 -    paths:
 -      - 'src/**'
 ```
+
+---
+
+## Panne 2 — Build et vérification
+
+**Symptôme :** La tâche build est verte et affiche bien le contenu de `dist/` dans ses logs, mais la tâche verifier échoue systématiquement avec ls: cannot access 'dist/': No such file or directory.
+
+**Cause :** `needs: build` impose un ordre d'exécution, pas un disque partagé. Les deux tâches s'exécutent sur deux machines virtuelles distinctes, créées puis détruites indépendamment. Le dossier `dist/` produit par build a disparu avec sa machine ; verifier démarre sur une machine neuve et vide, qui n'a même pas fait de checkout. Pour qu'un fichier passe d'une tâche à l'autre, il faut le publier en artefact.
+
+**Correction**
+
+```diff
+       - name: Construire la distribution
+         run: |
+           uv build
+           echo "Contenu de dist/ :"
+           ls -la dist/
++
++      - uses: actions/upload-artifact@v7
++        with:
++          name: distribution
++          path: dist/
+
+   verifier:
+     runs-on: ubuntu-latest
+     needs: build
+     steps:
++      - uses: actions/download-artifact@v8
++        with:
++          name: distribution
++          path: dist/
++
+       - name: Vérifier que la distribution existe
+```
+
+*Attention aux versions : upload-artifact est en v7 et download-artifact en v8. Écrire la même des deux côtés par symétrie produit une erreur de résolution.*
