@@ -1,0 +1,54 @@
+# ============================================================================
+# PANNE 3
+#
+# Symptôme rapporté par l'équipe :
+#
+#   « Les tests passent, le résumé de couverture est bien calculé. Mais le
+#     dernier step, qui doit publier le résultat en commentaire sur la pull
+#     request, échoue avec :
+#
+#         gh: Resource not accessible by integration (HTTP 403)
+#
+#     Je n'ai pourtant configuré aucun secret particulier, et la doc dit que
+#     GITHUB_TOKEN est fourni automatiquement. Le token serait expiré ? »
+#
+# Contexte : le dépôt est configuré avec les permissions de workflow par
+#            défaut en lecture seule (réglage recommandé).
+#
+# Votre mission : faire publier le commentaire, en accordant au workflow le
+# minimum de droits nécessaire — et rien de plus.
+# ============================================================================
+
+name: Couverture
+
+on:
+  pull_request:
+
+jobs:
+  couverture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v10.0.1
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Mesurer la couverture
+        id: cov
+        run: |
+          uv run pytest --cov=fleet_api --cov-report=term > cov.txt
+          TAUX=$(grep -E '^TOTAL' cov.txt | awk '{print $NF}')
+          echo "taux=$TAUX" >> "$GITHUB_OUTPUT"
+
+      - name: Commenter la pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body "Couverture sur cette PR : ${{ steps.cov.outputs.taux }}"

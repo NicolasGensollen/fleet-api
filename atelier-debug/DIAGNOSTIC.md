@@ -53,3 +53,23 @@
 ```
 
 *Attention aux versions : upload-artifact est en v7 et download-artifact en v8. Écrire la même des deux côtés par symétrie produit une erreur de résolution.*
+
+---
+
+## Panne 3 — Couverture
+
+**Symptôme :** Les tests passent et la couverture est calculée, mais la dernière étape échoue avec gh: Resource not accessible by integration (HTTP 403) au moment de publier le commentaire sur la pull request.
+
+**Cause :** Le jeton n'est ni absent ni expiré : il est sous-privilégié. Le dépôt est configuré avec les permissions de workflow par défaut en lecture seule — le réglage recommandé — et le workflow ne déclare aucun bloc permissions:. Le `GITHUB_TOKEN` fourni au run n'a donc pas le droit d'écrire sur les pull requests, et l'appel `gh pr comment` est refusé. Le message d'erreur ne le suggère pas : rien dans « Resource not accessible by integration » ne pointe vers un bloc permissions: manquant.
+
+**Correction**
+
+```diff
+ jobs:
+   couverture:
+     runs-on: ubuntu-latest
++    permissions:
++      contents: read
++      pull-requests: write
+     steps:
+```
