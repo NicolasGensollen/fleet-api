@@ -1,0 +1,46 @@
+# ============================================================================
+# PANNE 2
+#
+# Symptôme rapporté par l'équipe :
+#
+#   « Le job `build` est vert : il génère bien le fichier de distribution, je
+#     le vois dans les logs. Mais le job `verifier` échoue systématiquement
+#     avec :
+#
+#         ls: cannot access 'dist/': No such file or directory
+#         Error: Process completed with exit code 2
+#
+#     Le fichier existe pourtant, le job d'avant vient de le créer. Je ne
+#     comprends pas. »
+#
+# Votre mission : faire passer le job `verifier`, sans fusionner les deux jobs
+# en un seul.
+# ============================================================================
+
+name: Build et vérification
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v10.0.1
+
+      - name: Construire la distribution
+        run: |
+          uv build
+          echo "Contenu de dist/ :"
+          ls -la dist/
+
+  verifier:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Vérifier que la distribution existe
+        run: |
+          ls -la dist/
+          test -f dist/*.whl && echo "Distribution trouvée."
