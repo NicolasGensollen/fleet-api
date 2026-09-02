@@ -5,8 +5,8 @@ description = "Mini-service de supervision d'une flotte de robots — support du
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
+    "fastapi[standard]>=0.116",
+    "psycopg[binary]>=3.2",
 ]
 
 [dependency-groups]
@@ -37,6 +37,22 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "PT"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI utilise l'appel de fonction dans les valeurs par défaut comme mécanisme
+# d'injection de dépendances (Depends, Query, ...) : ce n'est pas le piège que B008
+# cherche à détecter (argument mutable partagé entre appels).
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Security",
+]
 
 [tool.coverage.run]
 source = ["src/fleet_api"]
