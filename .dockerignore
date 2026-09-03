@@ -3,10 +3,10 @@
 #  1. Il réduit le contexte de build envoyé au démon : moins de données à
 #     transférer, build plus rapide.
 #  2. Il évite que des fichiers locaux n'entrent dans l'image — et surtout que
-#     `.venv`, construit pour VOTRE machine, n'écrase celui de l'étage builder.
+#     `.venv`, construit pour votre machine, n'écrase celui de l'étage builder.
 #     C'est la recommandation explicite de la documentation uv.
 
-# Environnement virtuel local — le plus important de la liste
+# Environnement virtuel local
 .venv/
 venv/
 
