@@ -13,6 +13,7 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" \
             | docker login ghcr.io -u ${{ github.actor }} \
               --password-stdin
-          IMG=ghcr.io/${{ github.repository }}
+          # en minuscules : Docker refuse les majuscules
+          IMG=ghcr.io/${GITHUB_REPOSITORY,,}
           docker build -t $IMG:sha-${{ github.sha }} .
           docker push $IMG:sha-${{ github.sha }}
