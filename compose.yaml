@@ -36,7 +36,10 @@ services:
       DATABASE_URL: postgresql://app:app@db:5432/fleet
     ports:
       - "8000:8000"
-    depends_on: [db]
+    depends_on:
+      db:
+        # « démarré » ne suffit pas : on attend « en bonne santé ».
+        condition: service_healthy
 
 volumes:
   pgdata:
