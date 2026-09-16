@@ -42,6 +42,7 @@ tests/
 ## Backlog
 
 Évolutions possibles pour le rendu final, par ordre de difficulté croissante.
+
 Vous n'avez pas à toutes les traiter : mieux vaut deux fonctionnalités bien testées et bien intégrées que six bâclées.
 
 - [ ] `GET /robots/{id}/history` — historique de télémétrie d'un robot
@@ -63,3 +64,5 @@ Vous n'avez pas à toutes les traiter : mieux vaut deux fonctionnalités bien te
 | 6 | Couverture, typage, analyse statique, quality gate |
 | 7 | Release versionnée, environnements, bascule et retour arrière |
 | 8 | Revue croisée, finalisation |
+
+Bon courage !
