@@ -30,6 +30,9 @@ packages = ["src/fleet_api"]
 testpaths = ["tests"]
 addopts = "--strict-markers"
 pythonpath = ["src"]
+markers = [
+    "integration: test nécessitant une base de données (séance 5)",
+]
 
 [tool.ruff]
 line-length = 88
