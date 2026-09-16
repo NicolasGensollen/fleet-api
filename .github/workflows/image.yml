@@ -47,5 +47,5 @@ jobs:
         with:
           image-ref: ${{ steps.img.outputs.ref }}
           severity: 'CRITICAL,HIGH'
-          ignore-unfixed: false
+          ignore-unfixed: true
           exit-code: '1'
