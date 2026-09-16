@@ -64,3 +64,5 @@ Vous n'avez pas à toutes les traiter : mieux vaut deux fonctionnalités bien te
 | 6 | Couverture, typage, analyse statique, quality gate |
 | 7 | Release versionnée, environnements, bascule et retour arrière |
 | 8 | Revue croisée, finalisation |
+
+Bon courage !
