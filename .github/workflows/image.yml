@@ -66,8 +66,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          sbom: true
-          provenance: mode=max
+          sbom: ${{ github.event_name != 'pull_request' }}
+          provenance: ${{ github.event_name != 'pull_request' && 'mode=max' || 'false' }}
       - name: Référence de l'image à scanner
         id: img
         run: echo "ref=ghcr.io/${GITHUB_REPOSITORY,,}:sha-${{ github.sha }}" >> "$GITHUB_OUTPUT"
