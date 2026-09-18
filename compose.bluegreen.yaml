@@ -1,0 +1,55 @@
+# Blue-green local — deux versions du service coexistent, un proxy décide
+# laquelle reçoit le trafic.
+#
+#   docker compose -f compose.bluegreen.yaml up -d
+#   curl http://localhost:8080/version      -> la version « bleue »
+#   ./bascule.sh green                      -> bascule sans interruption
+#   curl http://localhost:8080/version      -> la version « verte »
+#   ./bascule.sh blue                       -> retour arrière
+
+services:
+  db:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: fleet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d fleet"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # --- Version en production (« bleue ») -----------------------------------
+  blue:
+    image: ${IMAGE_BLUE:-ghcr.io/nicolasgensollen/fleet-api:1.1.0}
+    platform: linux/amd64
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/fleet
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # --- Version candidate (« verte ») ---------------------------------------
+  # Elle tourne, elle est prête, mais elle ne reçoit aucun trafic.
+  green:
+    image: ${IMAGE_GREEN:-ghcr.io/nicolasgensollen/fleet-api:1.2.0}
+    platform: linux/amd64
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/fleet
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # --- Le proxy : c'est lui qui décide qui sert le trafic ------------------
+  proxy:
+    image: caddy:2.11-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Caddyfile.blue:/etc/caddy/Caddyfile.blue:ro
+      - ./Caddyfile.green:/etc/caddy/Caddyfile.green:ro
+    command: caddy run --config /etc/caddy/Caddyfile.blue
+    depends_on:
+      - blue
+      - green
