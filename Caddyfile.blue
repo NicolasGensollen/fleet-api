@@ -1,0 +1,8 @@
+# Configuration « bleue » : tout le trafic va vers le service blue.
+{
+	admin :2019
+}
+
+:8080 {
+	reverse_proxy blue:8000
+}

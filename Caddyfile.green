@@ -1,0 +1,8 @@
+# Configuration « verte » : tout le trafic va vers le service green.
+{
+	admin :2019
+}
+
+:8080 {
+	reverse_proxy green:8000
+}
