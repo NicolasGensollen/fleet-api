@@ -65,6 +65,57 @@ jobs:
           sbom: true
           provenance: mode=max
 
+  # --------------------------------------------------------------------------
+  # Test de fumée — on ALLUME l'artefact publié et on l'interroge.
+  #
+  # C'est le seul endroit du module où l'on teste l'image assemblée plutôt que
+  # le code qui la compose. Un artefact qui ne démarre pas ne se promeut pas.
+  # --------------------------------------------------------------------------
+  fumee:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: img
+        env:
+          DIGEST: ${{ needs.build.outputs.digest }}
+        run: echo "ref=ghcr.io/${GITHUB_REPOSITORY,,}@${DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Démarrer le conteneur
+        run: docker run -d --name fumee -p 8000:8000 "${{ steps.img.outputs.ref }}"
+
+      - name: Attendre que le service réponde
+        run: |
+          for i in $(seq 30); do
+            if curl -fsS http://localhost:8000/health > /dev/null; then
+              echo "Prêt après ${i} s."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Le service n'a pas répondu en 30 s."
+          exit 1
+
+      - name: Vérifier la version réellement servie
+        run: |
+          SERVIE=$(curl -fsS http://localhost:8000/version | jq -r .version)
+          ATTENDUE="${{ needs.build.outputs.version }}"
+          echo "Servie : $SERVIE — attendue : $ATTENDUE"
+          [ "$SERVIE" = "$ATTENDUE" ]
+
+      - name: Journaux du conteneur
+        if: always()
+        run: docker logs fumee
+
   # -------------------------------------------------------------- 2. release
   release:
     runs-on: ubuntu-latest
@@ -85,7 +136,7 @@ jobs:
   # ------------------------------------------------------- 3. recette (auto)
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: build                                    # ← MAILLON 3
+    needs: [build, fumee]                                    # ← MAILLON 3
     environment:
       name: staging
       url: https://staging.exemple.invalid
