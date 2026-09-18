@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']          # le SEUL déclencheur. Pas de branche, pas de dispatch.
+
+permissions: {}               # rien par défaut, on ouvre tâche par tâche
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  # ---------------------------------------------------------------- 1. build
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:                                        # ← MAILLON 2
+      digest:  ${{ steps.build.outputs.digest }}
+      version: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=long
+            type=raw,value=latest
+
+      - id: build                                   # ← MAILLON 1
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags:   ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          sbom: true
+          provenance: mode=max
+
+  # -------------------------------------------------------------- 2. release
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write          # créer la release : la seule écriture du workflow
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Créer la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" --generate-notes --verify-tag
+
+  # ------------------------------------------------------- 3. recette (auto)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build                                    # ← MAILLON 3
+    environment:
+      name: staging
+      url: https://staging.exemple.invalid
+    permissions:
+      contents: read
+
+    steps:
+      - run: |
+          echo "Déploiement de l'empreinte ${{ needs.build.outputs.digest }}"
+          echo "Version : ${{ needs.build.outputs.version }}"
+
+  # --------------------------------------------- 4. production (approbation)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [build, deploy-staging]                  # ← MAILLON 3
+    environment:
+      name: production
+      url: https://prod.exemple.invalid
+    permissions:
+      contents: read
+
+    steps:
+      - run: |
+          echo "Promotion de l'empreinte ${{ needs.build.outputs.digest }}"
+          echo "Aucune reconstruction : c'est le même artefact qu'en recette."
