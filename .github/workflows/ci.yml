@@ -49,7 +49,7 @@ jobs:
         run: uv run pytest -v --cov=fleet_api --cov-report=html --cov-report=term
       - uses: actions/upload-artifact@v7
         with:
-          name: couverture-py${{ matrix.python-version }}
+          name: couverture-py
           path: htmlcov/
           retention-days: 7
 
